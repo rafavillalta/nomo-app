@@ -1,4 +1,4 @@
-package com.nomoapp
+package com.nomo.nomo
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
