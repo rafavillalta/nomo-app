@@ -1,8 +1,14 @@
-// src/components/CustomButton.js
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 
-const CustomButton = ({ title, onPress, disabled, style }) => {
+type CustomButtonProps = {
+  title: string; // Título do botão
+  onPress: () => void; // Função chamada ao pressionar
+  disabled?: boolean; // Desabilitar botão (opcional)
+  style?: StyleProp<ViewStyle>; // Estilo adicional (opcional)
+};
+
+const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, disabled = false, style }) => {
   return (
     <TouchableOpacity
       style={[styles.button, disabled && styles.buttonDisabled, style]}

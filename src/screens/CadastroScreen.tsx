@@ -1,18 +1,27 @@
-// src/screens/CadastroScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { RootStackParamList } from '../types/navigation';
 
 // Importar componentes reutilizáveis
 import CustomButton from '../components/CustomButton';
 import CustomTextInput from '../components/CustomTextInput';
 import TextLink from '../components/TextLink';
 
-const CadastroScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+// Importar tipos para navegação
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
+
+type CadastroScreenProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'Cadastro'>;
+  route: RouteProp<RootStackParamList, 'Cadastro'>;
+};
+
+const CadastroScreen: React.FC<CadastroScreenProps> = ({ navigation }) => {
+  const [email, setEmail] = useState<string>(''); // Tipos explícitos
+  const [senha, setSenha] = useState<string>('');
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
   useEffect(() => {
     // Configurar Google Sign-In com o ID do cliente da web do Firebase
@@ -26,19 +35,18 @@ const CadastroScreen = ({ navigation }) => {
   // Função para autenticação com Google
   const signInWithGoogle = async () => {
     try {
-      // Faz o login com o Google
-      await GoogleSignin.hasPlayServices();
-      const { idToken } = await GoogleSignin.signIn();
-      
-      // Cria uma credencial do Firebase usando o token do Google
+      const userInfo: any = await GoogleSignin.signIn(); // Tipagem explícita como any
+      const { idToken } = userInfo;
+  
+      if (!idToken) {
+        throw new Error('Token de autenticação do Google não encontrado.');
+      }
+  
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      
-      // Faz o login no Firebase com a credencial do Google
       await auth().signInWithCredential(googleCredential);
-      
-      // Redireciona para a tela principal
       navigation.replace('Home');
-    } catch (error) {
+    } catch (error: any) {
+      // Tratamento de erros
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('Usuário cancelou o login com Google');
       } else if (error.code === statusCodes.IN_PROGRESS) {
@@ -50,32 +58,33 @@ const CadastroScreen = ({ navigation }) => {
       }
     }
   };
+  
+  
 
   const handleAvancar = async () => {
     try {
-      const userCredential = await auth().signInWithEmailAndPassword(email, senha);
+      await auth().signInWithEmailAndPassword(email, senha);
       navigation.replace('Home');
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'auth/user-not-found') {
         navigation.navigate('Register');
       } else {
         console.error(error);
-        alert("Erro ao autenticar. Verifique os dados e tente novamente.");
+        alert('Erro ao autenticar. Verifique os dados e tente novamente.');
       }
     }
   };
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/logo.png')} style={styles.logo} />
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
       <Text style={styles.slogan}>a mundo com menos missing out</Text>
 
       {/* Botão de Login com Google */}
       <CustomButton
         title="Continuar com Google"
         onPress={signInWithGoogle}
-        style={styles.googleButton}
-      />
+        style={styles.googleButton} />
 
       <Text style={styles.orText}>OU</Text>
 
@@ -84,29 +93,30 @@ const CadastroScreen = ({ navigation }) => {
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
-        keyboardType="email-address"
-      />
+        keyboardType="email-address" />
 
       {/* Input de Senha */}
       <CustomTextInput
         placeholder="Senha"
         value={senha}
         onChangeText={setSenha}
-        secureTextEntry
-      />
+        secureTextEntry />
 
       {/* Botão Avançar */}
       <CustomButton
         title="Avançar"
         onPress={handleAvancar}
-        disabled={isButtonDisabled}
-      />
+        disabled={isButtonDisabled} />
 
       {/* Links adicionais */}
-      <TextLink text="Esqueceu sua senha?" onPress={() => navigation.navigate('ForgotPassword')} />
+      <TextLink
+        text="Esqueceu sua senha?"
+        onPress={() => navigation.navigate('ForgotPassword')} />
       <View style={styles.registerContainer}>
         <Text>Não tem uma conta?</Text>
-        <TextLink text=" Registre-se aqui" onPress={() => navigation.navigate('Register')} />
+        <TextLink
+          text=" Registre-se aqui"
+          onPress={() => navigation.navigate('Register')} />
       </View>
     </View>
   );
@@ -140,6 +150,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
+  },
+  googleButton: {
+    backgroundColor: '#4285F4', // Azul do Google
+     marginBottom: 20,
   },
 });
 

@@ -1,8 +1,18 @@
-// src/components/CustomTextInput.js
 import React from 'react';
-import { TextInput, StyleSheet } from 'react-native';
+import { TextInput, StyleSheet, TextInputProps, StyleProp, ViewStyle } from 'react-native';
 
-const CustomTextInput = ({ placeholder, value, onChangeText, secureTextEntry, style, ...props }) => {
+type CustomTextInputProps = TextInputProps & {
+  style?: StyleProp<ViewStyle>; // Estilo adicional (opcional)
+};
+
+const CustomTextInput: React.FC<CustomTextInputProps> = ({
+  placeholder,
+  value,
+  onChangeText,
+  secureTextEntry,
+  style,
+  ...props
+}) => {
   return (
     <TextInput
       style={[styles.input, style]}
@@ -10,7 +20,7 @@ const CustomTextInput = ({ placeholder, value, onChangeText, secureTextEntry, st
       value={value}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
-      {...props}
+      {...props} // Permitir passar outras propriedades do TextInput
     />
   );
 };
